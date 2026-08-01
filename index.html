@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>POS Kasir Modern & Management System</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              accent: '#f97316'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- PWA Web Manifest (Data URI) -->
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlBPUyBLYXNpciBNb2Rlcm4iLAogICJzaG9ydF9uYW1lIjogIlBPUyBLYXNpciIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZjhmYWZjIiwKICAidGhlbWVfY29sb3IiOiAiIzEwYjk4MSIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI2NjYvMjY2NjUxNS5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Custom Glassmorphism UI */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    }
+
+    .glass-sidebar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    /* Hide scrollbars for clean UI */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Print Struk CSS */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-receipt-area, #print-receipt-area * {
+        visibility: visible;
+      }
+      #print-receipt-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-500 selection:text-white min-h-screen">
+
+  <!-- APP CONTAINER -->
+  <div id="app" class="flex flex-col md:flex-row min-h-screen w-full relative overflow-x-hidden">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-64 glass-sidebar min-h-screen fixed left-0 top-0 z-30 transition-all duration-300">
+      <!-- Logo Header -->
+      <div class="p-5 flex items-center gap-3 border-b border-slate-100">
+        <div class="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-500/30">
+          <i data-lucide="store" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-800 text-lg leading-tight">POS System</h1>
+          <p class="text-xs text-slate-400 font-medium" id="sidebar-outlet-name">Loading Outlet...</p>
+        </div>
+      </div>
+
+      <!-- Menu List -->
+      <div class="p-4 flex-1 space-y-1 overflow-y-auto no-scrollbar">
+        <p class="px-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">MENU UTAMA</p>
+        
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          <span>Dashboard</span>
+        </button>
+
+        <button onclick="switchTab('pos')" id="nav-pos" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="calculator" class="w-5 h-5"></i>
+          <span>POS Kasir</span>
+        </button>
+
+        <button onclick="switchTab('products')" id="nav-products" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="package" class="w-5 h-5"></i>
+          <span>Produk / Menu</span>
+        </button>
+
+        <button onclick="switchTab('outlets')" id="nav-outlets" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="building-2" class="w-5 h-5"></i>
+          <span>Outlet Toko</span>
+        </button>
+
+        <button onclick="switchTab('employees')" id="nav-employees" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="users" class="w-5 h-5"></i>
+          <span>Karyawan</span>
+        </button>
+
+        <button onclick="switchTab('users')" id="nav-users" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="user-cog" class="w-5 h-5"></i>
+          <span>Manajemen User</span>
+        </button>
+
+        <button onclick="switchTab('reports')" id="nav-reports" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="file-text" class="w-5 h-5"></i>
+          <span>Laporan</span>
+        </button>
+
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+          <i data-lucide="sliders" class="w-5 h-5"></i>
+          <span>Pengaturan</span>
+        </button>
+      </div>
+
+      <!-- User Profile Card in Sidebar -->
+      <div class="p-4 border-t border-slate-100">
+        <div class="glass-card p-3 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <div class="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
+              <span id="user-avatar-initial font-bold">U</span>
+            </div>
+            <div class="truncate">
+              <p class="text-xs font-bold text-slate-800 truncate" id="user-display-name">Guest User</p>
+              <p class="text-[10px] text-slate-400 uppercase font-semibold" id="user-display-role">Kasir</p>
+            </div>
+          </div>
+          <button onclick="handleLogout()" class="p-1.5 text-slate-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 flex justify-around items-center shadow-lg">
+      <button onclick="switchTab('dashboard')" id="mob-nav-dashboard" class="flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-0.5">Home</span>
+      </button>
+      <button onclick="switchTab('pos')" id="mob-nav-pos" class="flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
+        <i data-lucide="calculator" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-0.5">POS</span>
+      </button>
+      <button onclick="switchTab('products')" id="mob-nav-products" class="flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
+        <i data-lucide="package" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-0.5">Produk</span>
+      </button>
+      <button onclick="switchTab('reports')" id="mob-nav-reports" class="flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
+        <i data-lucide="file-text" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-0.5">Laporan</span>
+      </button>
+      <button onclick="openMobileMenuModal()" class="flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium mt-0.5">Lainnya</span>
+      </button>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 md:ml-64 p-4 md:p-8 mb-16 md:mb-0 max-w-full overflow-x-hidden">
+      
+      <!-- TOP HEADER STATUS BAR -->
+      <header class="flex items-center justify-between mb-6 pb-4 border-b border-slate-200/60">
+        <div>
+          <h2 id="page-title" class="text-xl md:text-2xl font-bold text-slate-800">Dashboard</h2>
+          <p class="text-xs md:text-sm text-slate-500">Kelola operasional dan penjualan toko Anda dengan efisien.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Preview Mode Badge -->
+          <div id="preview-badge" class="hidden sm:flex items-center gap-1.5 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            Mode Lokal / Preview
+          </div>
+          <!-- Current Time -->
+          <div class="text-right hidden sm:block">
+            <p id="clock-time" class="text-sm font-bold text-slate-700">00:00:00</p>
+            <p id="clock-date" class="text-[10px] text-slate-400 font-medium">1 Jan 2026</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- SECTIONS CONTAINER -->
+      <div id="content-container">
+
+        <!-- 1. DASHBOARD TAB -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+          <!-- Stat Cards Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-brand-500">
+              <div class="flex items-center justify-between text-slate-400 mb-2">
+                <span class="text-xs font-semibold uppercase tracking-wider">Omset Hari Ini</span>
+                <i data-lucide="dollar-sign" class="w-5 h-5 text-brand-500"></i>
+              </div>
+              <h3 id="stat-omset" class="text-lg md:text-xl font-bold text-slate-800">Rp 0</h3>
+              <p class="text-[11px] text-emerald-600 font-medium mt-1 flex items-center gap-1">
+                <i data-lucide="trending-up" class="w-3 h-3"></i> Realtime Sync
+              </p>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-blue-500">
+              <div class="flex items-center justify-between text-slate-400 mb-2">
+                <span class="text-xs font-semibold uppercase tracking-wider">Total Transaksi</span>
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-500"></i>
+              </div>
+              <h3 id="stat-trx" class="text-lg md:text-xl font-bold text-slate-800">0 Transaksi</h3>
+              <p class="text-[11px] text-slate-400 font-medium mt-1">Hari Ini</p>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-amber-500">
+              <div class="flex items-center justify-between text-slate-400 mb-2">
+                <span class="text-xs font-semibold uppercase tracking-wider">Total Produk</span>
+                <i data-lucide="box" class="w-5 h-5 text-amber-500"></i>
+              </div>
+              <h3 id="stat-products" class="text-lg md:text-xl font-bold text-slate-800">0 Items</h3>
+              <p class="text-[11px] text-slate-400 font-medium mt-1">Katalog Aktif</p>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-purple-500">
+              <div class="flex items-center justify-between text-slate-400 mb-2">
+                <span class="text-xs font-semibold uppercase tracking-wider">Karyawan</span>
+                <i data-lucide="users" class="w-5 h-5 text-purple-500"></i>
+              </div>
+              <h3 id="stat-employees" class="text-lg md:text-xl font-bold text-slate-800">0 Orang</h3>
+              <p class="text-[11px] text-slate-400 font-medium mt-1">Staf Terdaftar</p>
+            </div>
+          </div>
+
+          <!-- Quick Actions & Charts visual mockup -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Recent Sales Card -->
+            <div class="lg:col-span-2 glass-card p-5 rounded-2xl">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-800 text-base">Transaksi Terakhir</h3>
+                <button onclick="switchTab('reports')" class="text-xs text-brand-600 font-semibold hover:underline">Lihat Semua</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-600">
+                  <thead class="bg-slate-100/70 text-slate-500 font-semibold uppercase border-b border-slate-200">
+                    <tr>
+                      <th class="p-3">ID Transaksi</th>
+                      <th class="p-3">Kasir</th>
+                      <th class="p-3">Metode</th>
+                      <th class="p-3 text-right">Total</th>
+                      <th class="p-3 text-center">Waktu</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboard-recent-trx-list" class="divide-y divide-slate-100">
+                    <tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada transaksi hari ini</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Quick Info / Status Toko -->
+            <div class="glass-card p-5 rounded-2xl space-y-4">
+              <h3 class="font-bold text-slate-800 text-base">Informasi Toko</h3>
+              <div class="p-3 bg-brand-50 border border-brand-100 rounded-xl space-y-2">
+                <p class="text-xs font-semibold text-brand-800" id="dash-info-outlet">Nama Outlet: -</p>
+                <p class="text-xs text-brand-700" id="dash-info-address">Alamat: -</p>
+                <p class="text-xs text-brand-700" id="dash-info-phone">Telp: -</p>
+              </div>
+
+              <div class="border-t pt-3 border-slate-100">
+                <p class="text-xs font-semibold text-slate-600 mb-2">Aksi Cepat POS</p>
+                <button onclick="switchTab('pos')" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-sm shadow-md shadow-brand-500/20 flex items-center justify-center gap-2">
+                  <i data-lucide="calculator" class="w-4 h-4"></i> Buka Mesin Kasir
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. POS KASIR TAB -->
+        <section id="tab-pos" class="tab-content hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left: Product Catalog Grid (8 cols) -->
+            <div class="lg:col-span-7 space-y-4">
+              <!-- Search & Filter Bar -->
+              <div class="flex flex-col sm:flex-row gap-2">
+                <div class="relative flex-1">
+                  <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                  <input type="text" id="pos-search-input" onkeyup="renderPOSProducts()" placeholder="Cari nama produk..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <select id="pos-category-filter" onchange="renderPOSProducts()" class="py-2.5 px-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  <option value="ALL">Semua Kategori</option>
+                </select>
+              </div>
+
+              <!-- Product Cards Grid -->
+              <div id="pos-product-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[600px] overflow-y-auto no-scrollbar p-1">
+                <!-- Products injected via JS -->
+              </div>
+            </div>
+
+            <!-- Right: Cart / Order Summary (5 cols) -->
+            <div class="lg:col-span-5 glass-card p-4 rounded-2xl flex flex-col h-full min-h-[520px]">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-600"></i>
+                  <h3 class="font-bold text-slate-800">Keranjang Belanja</h3>
+                </div>
+                <button onclick="clearCart()" class="text-xs text-red-500 font-semibold hover:underline">Kosongkan</button>
+              </div>
+
+              <!-- Cart Item List -->
+              <div id="pos-cart-list" class="flex-1 py-3 overflow-y-auto max-h-[300px] space-y-3 no-scrollbar">
+                <p class="text-center text-slate-400 text-xs py-10">Keranjang masih kosong</p>
+              </div>
+
+              <!-- Calculation Footer -->
+              <div class="border-t border-slate-100 pt-3 space-y-2">
+                <div class="flex justify-between text-xs text-slate-500">
+                  <span>Subtotal</span>
+                  <span id="pos-subtotal" class="font-semibold text-slate-700">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-500">
+                  <span>Pajak (10%)</span>
+                  <span id="pos-tax" class="font-semibold text-slate-700">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-slate-800 pt-1 border-t border-dashed">
+                  <span>TOTAL BAYAR</span>
+                  <span id="pos-total" class="text-brand-600">Rp 0</span>
+                </div>
+
+                <!-- Payment Method Select -->
+                <div class="pt-2">
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Metode Pembayaran</label>
+                  <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="setPaymentMethod('Cash')" id="pay-method-Cash" class="pay-method-btn py-2 border rounded-xl text-xs font-semibold bg-brand-500 text-white border-brand-500">Tunai</button>
+                    <button type="button" onclick="setPaymentMethod('QRIS')" id="pay-method-QRIS" class="pay-method-btn py-2 border rounded-xl text-xs font-semibold bg-white text-slate-600 border-slate-200">QRIS</button>
+                    <button type="button" onclick="setPaymentMethod('Transfer')" id="pay-method-Transfer" class="pay-method-btn py-2 border rounded-xl text-xs font-semibold bg-white text-slate-600 border-slate-200">Transfer</button>
+                  </div>
+                </div>
+
+                <!-- Cash input if cash selected -->
+                <div id="cash-input-container" class="pt-1">
+                  <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Uang Diterima</label>
+                  <input type="number" id="pos-cash-given" oninput="calculateChange()" placeholder="0" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold">
+                  <div class="flex justify-between text-xs font-semibold mt-1">
+                    <span class="text-slate-500">Kembalian:</span>
+                    <span id="pos-change-amount" class="text-slate-800">Rp 0</span>
+                  </div>
+                </div>
+
+                <button onclick="processCheckout()" id="btn-checkout" class="w-full mt-3 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-sm shadow-md shadow-brand-500/30 flex items-center justify-center gap-2">
+                  <i data-lucide="check-circle" class="w-5 h-5"></i> Selesaikan Transaksi
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 3. PRODUK / MENU TAB -->
+        <section id="tab-products" class="tab-content hidden space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-lg">Katalog Produk</h3>
+            <button onclick="openProductModal()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+              <i data-lucide="plus" class="w-4 h-4"></i> Tambah Produk
+            </button>
+          </div>
+
+          <!-- Product Table Card -->
+          <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-600">
+                <thead class="bg-slate-100/80 text-slate-500 font-semibold uppercase border-b border-slate-200">
+                  <tr>
+                    <th class="p-3">Produk</th>
+                    <th class="p-3">Kategori</th>
+                    <th class="p-3 text-right">Harga Modal</th>
+                    <th class="p-3 text-right">Harga Jual</th>
+                    <th class="p-3 text-center">Stok</th>
+                    <th class="p-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="product-table-body" class="divide-y divide-slate-100">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. OUTLET TOKO TAB -->
+        <section id="tab-outlets" class="tab-content hidden space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-lg">Daftar Outlet Toko</h3>
+            <button onclick="openOutletModal()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+              <i data-lucide="plus" class="w-4 h-4"></i> Tambah Outlet
+            </button>
+          </div>
+
+          <div id="outlet-grid-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Injected via JS -->
+          </div>
+        </section>
+
+        <!-- 5. KARYAWAN TAB -->
+        <section id="tab-employees" class="tab-content hidden space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-lg">Daftar Karyawan</h3>
+            <button onclick="openEmployeeModal()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah Karyawan
+            </button>
+          </div>
+
+          <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-600">
+                <thead class="bg-slate-100/80 text-slate-500 font-semibold uppercase border-b border-slate-200">
+                  <tr>
+                    <th class="p-3">Nama</th>
+                    <th class="p-3">Jabatan / Divisi</th>
+                    <th class="p-3">No. Telepon</th>
+                    <th class="p-3 text-center">Status</th>
+                    <th class="p-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="employee-table-body" class="divide-y divide-slate-100">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. MANAJEMEN USER TAB -->
+        <section id="tab-users" class="tab-content hidden space-y-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-slate-800 text-lg">Manajemen User & Akses Kasir</h3>
+              <p class="text-xs text-slate-400">Atur kredensial akun kasir/operator untuk login lokal toko.</p>
+            </div>
+            <button onclick="openUserModal()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+              <i data-lucide="plus" class="w-4 h-4"></i> Tambah User
+            </button>
+          </div>
+
+          <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-600">
+                <thead class="bg-slate-100/80 text-slate-500 font-semibold uppercase border-b border-slate-200">
+                  <tr>
+                    <th class="p-3">Username / ID</th>
+                    <th class="p-3">Nama Lengkap</th>
+                    <th class="p-3">Role</th>
+                    <th class="p-3">PIN / Password</th>
+                    <th class="p-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="user-table-body" class="divide-y divide-slate-100">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. LAPORAN TAB -->
+        <section id="tab-reports" class="tab-content hidden space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+            <h3 class="font-bold text-slate-800 text-lg">Laporan Transaksi</h3>
+            <div class="flex gap-2">
+              <button onclick="exportReportToCSV()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-slate-600">
+                <thead class="bg-slate-100/80 text-slate-500 font-semibold uppercase border-b border-slate-200">
+                  <tr>
+                    <th class="p-3">ID Transaksi</th>
+                    <th class="p-3">Tanggal & Waktu</th>
+                    <th class="p-3">Kasir</th>
+                    <th class="p-3">Pembayaran</th>
+                    <th class="p-3 text-right">Total</th>
+                    <th class="p-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="report-table-body" class="divide-y divide-slate-100">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. PENGATURAN TAB -->
+        <section id="tab-settings" class="tab-content hidden space-y-6">
+          <div class="glass-card p-5 rounded-2xl max-w-2xl space-y-4">
+            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-2">Konfigurasi Aplikasi</h3>
+            
+            <div class="space-y-3">
+              <label class="block text-xs font-bold text-slate-600">Status Saklar Deployment (Supabase vs Preview)</label>
+              <div class="p-3 bg-slate-100 rounded-xl text-xs text-slate-600 flex items-center justify-between">
+                <span>Status Mode: <strong id="settings-preview-status" class="text-brand-600">PREVIEW MODE</strong></span>
+                <span class="text-[10px] bg-slate-200 px-2 py-1 rounded">Edit di JS: IS_PREVIEW</span>
+              </div>
+            </div>
+
+            <div class="space-y-3 border-t pt-3 border-slate-100">
+              <label class="block text-xs font-bold text-slate-600">Format Header Struk Cetak</label>
+              <textarea id="settings-receipt-header" rows="2" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs" placeholder="Pesan ucapan di atas struk..."></textarea>
+            </div>
+
+            <div class="space-y-3">
+              <label class="block text-xs font-bold text-slate-600">Format Footer Struk Cetak</label>
+              <textarea id="settings-receipt-footer" rows="2" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs" placeholder="Terima kasih telah berbelanja..."></textarea>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex gap-3">
+              <button onclick="saveSettings()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md">
+                Simpan Pengaturan
+              </button>
+              <button onclick="resetToDummyData()" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-bold shadow-md">
+                Reset & Setup Uang/Data Dummy
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL CONTAINER (DINAMIS) -->
+  <div id="modal-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="modal-box" class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <!-- Content injected by JS -->
+    </div>
+  </div>
+
+  <!-- LOGIN MODAL / SCREEN (IF NOT LOGGED IN) -->
+  <div id="login-overlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-card bg-white/90 p-6 md:p-8 rounded-3xl max-w-sm w-full space-y-6 shadow-2xl border border-white">
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 rounded-2xl bg-brand-500 text-white flex items-center justify-center mx-auto mb-2 shadow-lg shadow-brand-500/30">
+          <i data-lucide="store" class="w-7 h-7"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800">POS Login</h2>
+        <p class="text-xs text-slate-500">Masuk untuk mengakses sistem kasir</p>
+      </div>
+
+      <!-- Tab Switcher Admin vs User Kasir -->
+      <div class="flex p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+        <button onclick="switchLoginType('kasir')" id="tab-login-kasir" class="flex-1 py-2 rounded-lg bg-white shadow text-brand-600">Kasir / User</button>
+        <button onclick="switchLoginType('admin')" id="tab-login-admin" class="flex-1 py-2 rounded-lg text-slate-500">Admin Auth</button>
+      </div>
+
+      <!-- Kasir Form -->
+      <form id="form-login-kasir" onsubmit="handleKasirLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Username Kasir</label>
+          <input type="text" id="login-kasir-username" required placeholder="Contoh: kasir1" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">PIN / Password</label>
+          <input type="password" id="login-kasir-pin" required placeholder="••••" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <button type="submit" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm rounded-xl shadow-md shadow-brand-500/30">
+          Masuk Kasir
+        </button>
+      </form>
+
+      <!-- Admin Form -->
+      <form id="form-login-admin" onsubmit="handleAdminLogin(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email Admin</label>
+          <input type="email" id="login-admin-email" placeholder="admin@toko.com" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
+          <input type="password" id="login-admin-password" placeholder="••••••••" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <button type="submit" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm rounded-xl shadow-md shadow-brand-500/30">
+          Masuk Admin Auth
+        </button>
+      </form>
+
+      <p class="text-[11px] text-center text-slate-400">Akun Kasir Default: <strong>kasir1</strong> / PIN: <strong>1234</strong></p>
+    </div>
+  </div>
+
+  <!-- PRINT RECEIPT HIDDEN TEMPLATE -->
+  <div id="print-receipt-area" class="hidden p-4 bg-white text-black font-mono text-xs max-w-[300px] mx-auto">
+    <div class="text-center mb-2">
+      <h2 id="receipt-outlet-name" class="font-bold text-sm">NAMA TOKO</h2>
+      <p id="receipt-outlet-address" class="text-[10px]">Alamat Toko</p>
+      <p id="receipt-outlet-phone" class="text-[10px]">Telp: -</p>
+    </div>
+    <div class="border-b border-black my-1"></div>
+    <div id="receipt-meta" class="text-[10px] space-y-0.5"></div>
+    <div class="border-b border-black my-1"></div>
+    <div id="receipt-items-list" class="space-y-1"></div>
+    <div class="border-b border-black my-1"></div>
+    <div id="receipt-totals" class="space-y-0.5 text-right font-bold"></div>
+    <div class="border-b border-black my-1"></div>
+    <p id="receipt-footer-msg" class="text-center text-[10px] mt-2"></p>
+  </div>
+
+
+  <!-- MAIN JS APP LOGIC -->
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // -----------------------------------------------------------------
+    // 1. KONFIGURASI SAKLAR DEPLOYMENT
+    // -----------------------------------------------------------------
+    const IS_PREVIEW = false; // Set false JIKA SUDAH TERHUBUNG KE SUPABASE PRODUCTION
+
+    const supabaseConfig = {
+      url: "https://uftkczidqefvklvbmsne.supabase.co",   // Ganti dengan Project URL Supabase Anda
+      anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmdGtjemlkcWVmdmtsdmJtc25lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1ODg5NzMsImV4cCI6MjEwMTE2NDk3M30.jaDYTEhVSTSozvmGFHqtHOre9i6UYuG2lkC27QEDOck"          // Ganti dengan anon public key Supabase Anda
+    };
+
+    // Supabase Init
+    const supabase = IS_PREVIEW ? null : createClient(supabaseConfig.url, supabaseConfig.anonKey);
+
+    // -----------------------------------------------------------------
+    // 1b. MAPPER FIELD (JS camelCase <-> Kolom Postgres snake_case)
+    // -----------------------------------------------------------------
+    const mapProductToDb = (p) => ({ id: p.id, name: p.name, category: p.category, buy_price: p.buyPrice, sell_price: p.sellPrice, stock: p.stock });
+    const mapProductFromDb = (r) => ({ id: r.id, name: r.name, category: r.category, buyPrice: r.buy_price, sellPrice: r.sell_price, stock: r.stock });
+
+    const mapTrxToDb = (t) => ({
+      id: t.id, date: t.date, time: t.time, items: t.items, subtotal: t.subtotal, tax: t.tax, total: t.total,
+      payment_method: t.paymentMethod, cash_given: t.cashGiven, change_amount: t.change, cashier: t.cashier
+    });
+    const mapTrxFromDb = (r) => ({
+      id: r.id, date: r.date, time: r.time, items: r.items, subtotal: r.subtotal, tax: r.tax, total: r.total,
+      paymentMethod: r.payment_method, cashGiven: r.cash_given, change: r.change_amount, cashier: r.cashier
+    });
+
+    const mapSettingsToDb = (s) => ({ id: 'config', receipt_header: s.receiptHeader, receipt_footer: s.receiptFooter });
+    const mapSettingsFromDb = (r) => ({ receiptHeader: r.receipt_header, receiptFooter: r.receipt_footer });
+
+    // Global State
+    let currentUser = null; // { username, name, role }
+    let cart = [];
+    let selectedPaymentMethod = 'Cash';
+
+    // Local Storage Mock DB State for Preview Mode
+    let dbMock = {
+      outlets: [],
+      products: [],
+      users: [],
+      employees: [],
+      transactions: [],
+      settings: { receiptHeader: 'Selamat Datang di Toko Kami!', receiptFooter: 'Terima Kasih Telah Berbelanja!' }
+    };
+
+    // -----------------------------------------------------------------
+    // 2. DUMMY DATA SEEDER
+    // -----------------------------------------------------------------
+    const DUMMY_DATA = {
+      outlets: [
+        { id: 'out-1', name: 'Outlet Utama Pusat', address: 'Jl. Merdeka No. 45, Jakarta', phone: '081234567890' }
+      ],
+      products: [
+        { id: 'p1', name: 'Kopi Espresso', category: 'Minuman', buyPrice: 8000, sellPrice: 18000, stock: 50 },
+        { id: 'p2', name: 'Americano Ice', category: 'Minuman', buyPrice: 10000, sellPrice: 22000, stock: 40 },
+        { id: 'p3', name: 'Roti Bakar Cokelat', category: 'Makanan', buyPrice: 7000, sellPrice: 15000, stock: 30 },
+        { id: 'p4', name: 'Croissant Butter', category: 'Makanan', buyPrice: 12000, sellPrice: 25000, stock: 20 },
+        { id: 'p5', name: 'Matcha Latte', category: 'Minuman', buyPrice: 14000, sellPrice: 28000, stock: 35 }
+      ],
+      users: [
+        { id: 'u1', username: 'kasir1', name: 'Ahmad Kasir', pin: '1234', role: 'Kasir' },
+        { id: 'u2', username: 'admin1', name: 'Budi Owner', pin: '8888', role: 'Admin' }
+      ],
+      employees: [
+        { id: 'e1', name: 'Ahmad Kasir', role: 'Operator Kasir', phone: '0811111111', status: 'Aktif' },
+        { id: 'e2', name: 'Siti Barista', role: 'Staff Barista', phone: '0822222222', status: 'Aktif' }
+      ],
+      transactions: [],
+      settings: {
+        receiptHeader: 'POS KASIR MODERN\nSentosa Plaza Lantai 1',
+        receiptFooter: 'Barang yang sudah dibeli tidak dapat ditukar.\nTerima Kasih!'
+      }
+    };
+
+    // -----------------------------------------------------------------
+    // 3. AUTO SETUP DATABASE FUNCTION
+    // -----------------------------------------------------------------
+    async function autoSetupDatabase() {
+      if (IS_PREVIEW) {
+        const stored = localStorage.getItem('POS_MOCK_DB');
+        if (!stored) {
+          dbMock = { ...DUMMY_DATA };
+          localStorage.setItem('POS_MOCK_DB', JSON.stringify(dbMock));
+        } else {
+          dbMock = JSON.parse(stored);
+        }
+        return;
+      }
+
+      try {
+        const { count } = await supabase.from('outlets').select('*', { count: 'exact', head: true });
+        if (!count || count === 0) {
+          // Populate Initial Outlets
+          await supabase.from('outlets').insert(DUMMY_DATA.outlets);
+          // Populate Initial Products
+          await supabase.from('products').insert(DUMMY_DATA.products.map(mapProductToDb));
+          // Populate Initial Users
+          await supabase.from('users').insert(DUMMY_DATA.users);
+          // Populate Initial Employees
+          await supabase.from('employees').insert(DUMMY_DATA.employees);
+          // Settings
+          await supabase.from('settings').upsert(mapSettingsToDb(DUMMY_DATA.settings));
+        }
+      } catch (err) {
+        console.error("Auto Setup Database Error:", err);
+      }
+    }
+
+    // Save Local Storage
+    function saveMockDB() {
+      if (IS_PREVIEW) {
+        localStorage.setItem('POS_MOCK_DB', JSON.stringify(dbMock));
+        renderAllData();
+      }
+    }
+
+    // -----------------------------------------------------------------
+    // 4. REALTIME DATA LISTENER & FETCH
+    // -----------------------------------------------------------------
+    async function fetchTable(table, mapFn) {
+      const { data, error } = await supabase.from(table).select('*');
+      if (error) {
+        console.error(`Gagal mengambil data ${table}:`, error);
+        return [];
+      }
+      return mapFn ? data.map(mapFn) : data;
+    }
+
+    async function setupRealtimeListeners() {
+      if (IS_PREVIEW) {
+        renderAllData();
+        return;
+      }
+
+      // Fetch data awal
+      dbMock.products = await fetchTable('products', mapProductFromDb);
+      dbMock.outlets = await fetchTable('outlets');
+      dbMock.users = await fetchTable('users');
+      dbMock.employees = await fetchTable('employees');
+      dbMock.transactions = await fetchTable('transactions', mapTrxFromDb);
+      const settingsRows = await fetchTable('settings', mapSettingsFromDb);
+      if (settingsRows.length > 0) dbMock.settings = settingsRows[0];
+      renderAllData();
+
+      // Supabase Realtime: dengar perubahan pada tiap tabel lalu ambil ulang data tabel terkait
+      supabase.channel('pos-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, async () => {
+          dbMock.products = await fetchTable('products', mapProductFromDb);
+          renderAllData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'outlets' }, async () => {
+          dbMock.outlets = await fetchTable('outlets');
+          renderAllData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async () => {
+          dbMock.users = await fetchTable('users');
+          renderAllData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'employees' }, async () => {
+          dbMock.employees = await fetchTable('employees');
+          renderAllData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, async () => {
+          dbMock.transactions = await fetchTable('transactions', mapTrxFromDb);
+          renderAllData();
+        })
+        .subscribe();
+    }
+
+    // -----------------------------------------------------------------
+    // 5. RENDER UI FUNCTIONS
+    // -----------------------------------------------------------------
+    window.renderAllData = function() {
+      renderDashboard();
+      renderPOSProducts();
+      renderProductsTable();
+      renderOutlets();
+      renderEmployeesTable();
+      renderUsersTable();
+      renderReportsTable();
+      updateSidebarOutlet();
+      lucide.createIcons();
+    };
+
+    function updateSidebarOutlet() {
+      const outlet = dbMock.outlets[0] || { name: 'Outlet Toko', address: '-' };
+      document.getElementById('sidebar-outlet-name').innerText = outlet.name;
+      document.getElementById('dash-info-outlet').innerText = `Nama Outlet: ${outlet.name}`;
+      document.getElementById('dash-info-address').innerText = `Alamat: ${outlet.address}`;
+      document.getElementById('dash-info-phone').innerText = `Telp: ${outlet.phone || '-'}`;
+    }
+
+    function renderDashboard() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayTrx = dbMock.transactions.filter(t => t.date && t.date.startsWith(today));
+      
+      const totalOmset = todayTrx.reduce((sum, t) => sum + (t.total || 0), 0);
+      
+      document.getElementById('stat-omset').innerText = `Rp ${totalOmset.toLocaleString('id-ID')}`;
+      document.getElementById('stat-trx').innerText = `${todayTrx.length} Transaksi`;
+      document.getElementById('stat-products').innerText = `${dbMock.products.length} Items`;
+      document.getElementById('stat-employees').innerText = `${dbMock.employees.length} Orang`;
+
+      // Render Recent Trx
+      const tbody = document.getElementById('dashboard-recent-trx-list');
+      if (todayTrx.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada transaksi hari ini</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = todayTrx.slice(-5).reverse().map(t => `
+        <tr>
+          <td class="p-3 font-semibold text-slate-700">#${t.id.substr(-6)}</td>
+          <td class="p-3">${t.cashier || 'Kasir'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold">${t.paymentMethod}</span></td>
+          <td class="p-3 text-right font-bold text-slate-800">Rp ${(t.total||0).toLocaleString('id-ID')}</td>
+          <td class="p-3 text-center text-slate-400">${t.time || ''}</td>
+        </tr>
+      `).join('');
+    }
+
+    window.renderPOSProducts = function() {
+      const search = document.getElementById('pos-search-input').value.toLowerCase();
+      const cat = document.getElementById('pos-category-filter').value;
+      const grid = document.getElementById('pos-product-grid');
+
+      // Populate Category options
+      const categories = ['ALL', ...new Set(dbMock.products.map(p => p.category))];
+      document.getElementById('pos-category-filter').innerHTML = categories.map(c => `<option value="${c}">${c === 'ALL' ? 'Semua Kategori' : c}</option>`).join('');
+      document.getElementById('pos-category-filter').value = cat;
+
+      const filtered = dbMock.products.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(search);
+        const matchesCat = cat === 'ALL' || p.category === cat;
+        return matchesSearch && matchesCat;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center text-slate-400 text-xs py-8">Produk tidak ditemukan</p>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => `
+        <div onclick="addToCart('${p.id}')" class="glass-card p-3 rounded-2xl cursor-pointer hover:border-brand-500 transition-all flex flex-col justify-between space-y-2 group">
+          <div>
+            <span class="text-[9px] font-bold uppercase text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">${p.category}</span>
+            <h4 class="font-bold text-slate-800 text-xs mt-1 line-clamp-2 group-hover:text-brand-600">${p.name}</h4>
+          </div>
+          <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+            <span class="text-xs font-bold text-slate-700">Rp ${p.sellPrice.toLocaleString('id-ID')}</span>
+            <span class="text-[10px] text-slate-400">Stok: ${p.stock}</span>
+          </div>
+        </div>
+      `).join('');
+    };
+
+    // -----------------------------------------------------------------
+    // 6. POS CART OPERATIONS
+    // -----------------------------------------------------------------
+    window.addToCart = function(productId) {
+      const prod = dbMock.products.find(p => p.id === productId);
+      if (!prod || prod.stock <= 0) {
+        alert('Stok habis!');
+        return;
+      }
+
+      const existing = cart.find(item => item.id === productId);
+      if (existing) {
+        if (existing.qty >= prod.stock) {
+          alert('Jumlah melebihi stok tersedia');
+          return;
+        }
+        existing.qty += 1;
+      } else {
+        cart.push({ id: prod.id, name: prod.name, price: prod.sellPrice, qty: 1 });
+      }
+      renderCart();
+    };
+
+    window.updateCartQty = function(productId, delta) {
+      const item = cart.find(i => i.id === productId);
+      if (!item) return;
+
+      const prod = dbMock.products.find(p => p.id === productId);
+      item.qty += delta;
+
+      if (item.qty > prod.stock) {
+        alert('Melebihi stok!');
+        item.qty = prod.stock;
+      }
+
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.id !== productId);
+      }
+      renderCart();
+    };
+
+    window.clearCart = function() {
+      cart = [];
+      renderCart();
+    };
+
+    function renderCart() {
+      const list = document.getElementById('pos-cart-list');
+      if (cart.length === 0) {
+        list.innerHTML = `<p class="text-center text-slate-400 text-xs py-10">Keranjang masih kosong</p>`;
+        document.getElementById('pos-subtotal').innerText = 'Rp 0';
+        document.getElementById('pos-tax').innerText = 'Rp 0';
+        document.getElementById('pos-total').innerText = 'Rp 0';
+        calculateChange();
+        return;
+      }
+
+      let subtotal = 0;
+      list.innerHTML = cart.map(i => {
+        const itemTotal = i.price * i.qty;
+        subtotal += itemTotal;
+        return `
+          <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl text-xs">
+            <div class="flex-1 pr-2">
+              <p class="font-bold text-slate-700 truncate">${i.name}</p>
+              <p class="text-[10px] text-slate-400">Rp ${i.price.toLocaleString('id-ID')}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="updateCartQty('${i.id}', -1)" class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 font-bold hover:bg-slate-100">-</button>
+              <span class="font-bold text-slate-700 text-xs w-4 text-center">${i.qty}</span>
+              <button onclick="updateCartQty('${i.id}', 1)" class="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-600 font-bold hover:bg-slate-100">+</button>
+            </div>
+            <div class="text-right pl-3 font-bold text-slate-800">
+              Rp ${itemTotal.toLocaleString('id-ID')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const tax = Math.round(subtotal * 0.1);
+      const total = subtotal + tax;
+
+      document.getElementById('pos-subtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+      document.getElementById('pos-tax').innerText = `Rp ${tax.toLocaleString('id-ID')}`;
+      document.getElementById('pos-total').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+      calculateChange();
+    }
+
+    window.setPaymentMethod = function(method) {
+      selectedPaymentMethod = method;
+      document.querySelectorAll('.pay-method-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-500', 'text-white', 'border-brand-500');
+        btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+      });
+      const activeBtn = document.getElementById(`pay-method-${method}`);
+      activeBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+      activeBtn.classList.add('bg-brand-500', 'text-white', 'border-brand-500');
+
+      const cashContainer = document.getElementById('cash-input-container');
+      if (method === 'Cash') {
+        cashContainer.classList.remove('hidden');
+      } else {
+        cashContainer.classList.add('hidden');
+      }
+    };
+
+    window.calculateChange = function() {
+      const subtotalStr = document.getElementById('pos-subtotal').innerText.replace(/\D/g, '');
+      const subtotal = parseInt(subtotalStr) || 0;
+      const total = subtotal + Math.round(subtotal * 0.1);
+
+      const cashGiven = parseInt(document.getElementById('pos-cash-given').value) || 0;
+      const change = cashGiven - total;
+
+      document.getElementById('pos-change-amount').innerText = `Rp ${Math.max(0, change).toLocaleString('id-ID')}`;
+    };
+
+    window.processCheckout = async function() {
+      if (cart.length === 0) {
+        alert('Keranjang belanjaan kosong!');
+        return;
+      }
+
+      const subtotalStr = document.getElementById('pos-subtotal').innerText.replace(/\D/g, '');
+      const subtotal = parseInt(subtotalStr) || 0;
+      const tax = Math.round(subtotal * 0.1);
+      const total = subtotal + tax;
+
+      const cashGiven = parseInt(document.getElementById('pos-cash-given').value) || 0;
+      if (selectedPaymentMethod === 'Cash' && cashGiven < total) {
+        alert('Uang tunai kurang dari total pembayaran!');
+        return;
+      }
+
+      const now = new Date();
+      const transactionData = {
+        id: 'TRX-' + Date.now(),
+        date: now.toISOString(),
+        time: now.toLocaleTimeString('id-ID'),
+        items: [...cart],
+        subtotal,
+        tax,
+        total,
+        paymentMethod: selectedPaymentMethod,
+        cashGiven: selectedPaymentMethod === 'Cash' ? cashGiven : total,
+        change: selectedPaymentMethod === 'Cash' ? (cashGiven - total) : 0,
+        cashier: currentUser ? currentUser.name : 'Kasir Default'
+      };
+
+      // Deduct stock
+      for (const cartItem of cart) {
+        const prod = dbMock.products.find(p => p.id === cartItem.id);
+        if (prod) {
+          prod.stock = Math.max(0, prod.stock - cartItem.qty);
+          if (!IS_PREVIEW) {
+            await supabase.from('products').update({ stock: prod.stock }).eq('id', prod.id);
+          }
+        }
+      }
+
+      // Save Transaction
+      if (IS_PREVIEW) {
+        dbMock.transactions.push(transactionData);
+        saveMockDB();
+      } else {
+        await supabase.from('transactions').insert(mapTrxToDb(transactionData));
+      }
+
+      // Print Receipt
+      printReceipt(transactionData);
+
+      // Reset
+      clearCart();
+      document.getElementById('pos-cash-given').value = '';
+      alert('Transaksi Berhasil Disimpan!');
+    };
+
+    function printReceipt(trx) {
+      const outlet = dbMock.outlets[0] || { name: 'Outlet Toko', address: '-', phone: '-' };
+      document.getElementById('receipt-outlet-name').innerText = outlet.name;
+      document.getElementById('receipt-outlet-address').innerText = outlet.address;
+      document.getElementById('receipt-outlet-phone').innerText = `Telp: ${outlet.phone}`;
+
+      document.getElementById('receipt-meta').innerHTML = `
+        <p>No: ${trx.id}</p>
+        <p>Tgl: ${new Date(trx.date).toLocaleDateString('id-ID')} ${trx.time}</p>
+        <p>Kasir: ${trx.cashier}</p>
+      `;
+
+      document.getElementById('receipt-items-list').innerHTML = trx.items.map(i => `
+        <div class="flex justify-between">
+          <span>${i.name} x${i.qty}</span>
+          <span>Rp ${(i.price * i.qty).toLocaleString('id-ID')}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('receipt-totals').innerHTML = `
+        <p>Subtotal: Rp ${trx.subtotal.toLocaleString('id-ID')}</p>
+        <p>Pajak (10%): Rp ${trx.tax.toLocaleString('id-ID')}</p>
+        <p>Total: Rp ${trx.total.toLocaleString('id-ID')}</p>
+        <p>Bayar (${trx.paymentMethod}): Rp ${trx.cashGiven.toLocaleString('id-ID')}</p>
+        <p>Kembali: Rp ${trx.change.toLocaleString('id-ID')}</p>
+      `;
+
+      document.getElementById('receipt-footer-msg').innerText = dbMock.settings.receiptFooter || 'Terima Kasih';
+
+      window.print();
+    }
+
+    // -----------------------------------------------------------------
+    // 7. MANAGEMENT TABLES RENDER & MODALS
+    // -----------------------------------------------------------------
+    function renderProductsTable() {
+      const tbody = document.getElementById('product-table-body');
+      tbody.innerHTML = dbMock.products.map(p => `
+        <tr>
+          <td class="p-3 font-bold text-slate-800">${p.name}</td>
+          <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-600">${p.category}</span></td>
+          <td class="p-3 text-right">Rp ${p.buyPrice.toLocaleString('id-ID')}</td>
+          <td class="p-3 text-right font-bold text-slate-800">Rp ${p.sellPrice.toLocaleString('id-ID')}</td>
+          <td class="p-3 text-center font-bold ${p.stock < 5 ? 'text-red-500' : 'text-slate-700'}">${p.stock}</td>
+          <td class="p-3 text-center space-x-1">
+            <button onclick="deleteProduct('${p.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.openProductModal = function() {
+      showModal(`
+        <h3 class="font-bold text-slate-800 text-lg">Tambah Produk Baru</h3>
+        <form onsubmit="saveProductForm(event)" class="space-y-3">
+          <input type="text" id="m-prod-name" required placeholder="Nama Produk" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <input type="text" id="m-prod-cat" required placeholder="Kategori (misal: Minuman)" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="m-prod-buy" required placeholder="Harga Modal (Rp)" class="p-2.5 border border-slate-200 rounded-xl text-xs">
+            <input type="number" id="m-prod-sell" required placeholder="Harga Jual (Rp)" class="p-2.5 border border-slate-200 rounded-xl text-xs">
+          </div>
+          <input type="number" id="m-prod-stock" required placeholder="Jumlah Stok Awal" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <button type="submit" class="w-full py-2.5 bg-brand-500 text-white rounded-xl text-xs font-bold">Simpan Produk</button>
+        </form>
+      `);
+    };
+
+    window.saveProductForm = async function(e) {
+      e.preventDefault();
+      const newProd = {
+        id: 'p-' + Date.now(),
+        name: document.getElementById('m-prod-name').value,
+        category: document.getElementById('m-prod-cat').value,
+        buyPrice: parseInt(document.getElementById('m-prod-buy').value) || 0,
+        sellPrice: parseInt(document.getElementById('m-prod-sell').value) || 0,
+        stock: parseInt(document.getElementById('m-prod-stock').value) || 0,
+      };
+
+      if (IS_PREVIEW) {
+        dbMock.products.push(newProd);
+        saveMockDB();
+      } else {
+        await supabase.from('products').insert(mapProductToDb(newProd));
+      }
+      closeModal();
+    };
+
+    window.deleteProduct = async function(id) {
+      if (!confirm('Hapus produk ini?')) return;
+      if (IS_PREVIEW) {
+        dbMock.products = dbMock.products.filter(p => p.id !== id);
+        saveMockDB();
+      } else {
+        await supabase.from('products').delete().eq('id', id);
+      }
+    };
+
+    function renderOutlets() {
+      const grid = document.getElementById('outlet-grid-list');
+      grid.innerHTML = dbMock.outlets.map(o => `
+        <div class="glass-card p-4 rounded-2xl space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 text-sm">${o.name}</h4>
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Aktif</span>
+          </div>
+          <p class="text-xs text-slate-500">${o.address}</p>
+          <p class="text-xs font-semibold text-slate-600">Telp: ${o.phone}</p>
+        </div>
+      `).join('');
+    }
+
+    window.openOutletModal = function() {
+      showModal(`
+        <h3 class="font-bold text-slate-800 text-lg">Tambah Outlet Toko</h3>
+        <form onsubmit="saveOutletForm(event)" class="space-y-3">
+          <input type="text" id="m-out-name" required placeholder="Nama Outlet Toko" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <input type="text" id="m-out-addr" required placeholder="Alamat Lengkap" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <input type="text" id="m-out-phone" required placeholder="No. Telepon / Whatsapp" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <button type="submit" class="w-full py-2.5 bg-brand-500 text-white rounded-xl text-xs font-bold">Simpan Outlet</button>
+        </form>
+      `);
+    };
+
+    window.saveOutletForm = async function(e) {
+      e.preventDefault();
+      const newOut = {
+        id: 'out-' + Date.now(),
+        name: document.getElementById('m-out-name').value,
+        address: document.getElementById('m-out-addr').value,
+        phone: document.getElementById('m-out-phone').value,
+      };
+
+      if (IS_PREVIEW) {
+        dbMock.outlets.push(newOut);
+        saveMockDB();
+      } else {
+        await supabase.from('outlets').insert(newOut);
+      }
+      closeModal();
+    };
+
+    function renderEmployeesTable() {
+      const tbody = document.getElementById('employee-table-body');
+      tbody.innerHTML = dbMock.employees.map(e => `
+        <tr>
+          <td class="p-3 font-bold text-slate-800">${e.name}</td>
+          <td class="p-3">${e.role}</td>
+          <td class="p-3">${e.phone}</td>
+          <td class="p-3 text-center"><span class="px-2 py-0.5 bg-brand-100 text-brand-800 rounded text-[10px] font-bold">${e.status}</span></td>
+          <td class="p-3 text-center">
+            <button onclick="deleteEmployee('${e.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.openEmployeeModal = function() {
+      showModal(`
+        <h3 class="font-bold text-slate-800 text-lg">Tambah Karyawan</h3>
+        <form onsubmit="saveEmployeeForm(event)" class="space-y-3">
+          <input type="text" id="m-emp-name" required placeholder="Nama Lengkap Karyawan" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <input type="text" id="m-emp-role" required placeholder="Jabatan (misal: Kasir/Barista)" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <input type="text" id="m-emp-phone" required placeholder="No Telepon" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <button type="submit" class="w-full py-2.5 bg-brand-500 text-white rounded-xl text-xs font-bold">Simpan Karyawan</button>
+        </form>
+      `);
+    };
+
+    window.saveEmployeeForm = async function(e) {
+      e.preventDefault();
+      const newEmp = {
+        id: 'emp-' + Date.now(),
+        name: document.getElementById('m-emp-name').value,
+        role: document.getElementById('m-emp-role').value,
+        phone: document.getElementById('m-emp-phone').value,
+        status: 'Aktif'
+      };
+
+      if (IS_PREVIEW) {
+        dbMock.employees.push(newEmp);
+        saveMockDB();
+      } else {
+        await supabase.from('employees').insert(newEmp);
+      }
+      closeModal();
+    };
+
+    window.deleteEmployee = async function(id) {
+      if (!confirm('Hapus karyawan ini?')) return;
+      if (IS_PREVIEW) {
+        dbMock.employees = dbMock.employees.filter(e => e.id !== id);
+        saveMockDB();
+      } else {
+        await supabase.from('employees').delete().eq('id', id);
+      }
+    };
+
+    function renderUsersTable() {
+      const tbody = document.getElementById('user-table-body');
+      tbody.innerHTML = dbMock.users.map(u => `
+        <tr>
+          <td class="p-3 font-bold text-slate-800">${u.username}</td>
+          <td class="p-3">${u.name}</td>
+          <td class="p-3"><span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-[10px] font-bold">${u.role}</span></td>
+          <td class="p-3 font-mono">•••• (${u.pin})</td>
+          <td class="p-3 text-center">
+            <button onclick="deleteUser('${u.id}')" class="p-1 text-red-500 hover:bg-red-50 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.openUserModal = function() {
+      showModal(`
+        <h3 class="font-bold text-slate-800 text-lg">Tambah User Login Kasir</h3>
+        <form onsubmit="saveUserForm(event)" class="space-y-3">
+          <input type="text" id="m-usr-username" required placeholder="Username (misal: kasir2)" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <input type="text" id="m-usr-name" required placeholder="Nama Pengguna" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <input type="password" id="m-usr-pin" required placeholder="PIN / Password" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+          <select id="m-usr-role" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs">
+            <option value="Kasir">Kasir</option>
+            <option value="Admin">Admin Toko</option>
+          </select>
+          <button type="submit" class="w-full py-2.5 bg-brand-500 text-white rounded-xl text-xs font-bold">Simpan User</button>
+        </form>
+      `);
+    };
+
+    window.saveUserForm = async function(e) {
+      e.preventDefault();
+      const newUser = {
+        id: 'usr-' + Date.now(),
+        username: document.getElementById('m-usr-username').value,
+        name: document.getElementById('m-usr-name').value,
+        pin: document.getElementById('m-usr-pin').value,
+        role: document.getElementById('m-usr-role').value
+      };
+
+      if (IS_PREVIEW) {
+        dbMock.users.push(newUser);
+        saveMockDB();
+      } else {
+        await supabase.from('users').insert(newUser);
+      }
+      closeModal();
+    };
+
+    window.deleteUser = async function(id) {
+      if (!confirm('Hapus user ini?')) return;
+      if (IS_PREVIEW) {
+        dbMock.users = dbMock.users.filter(u => u.id !== id);
+        saveMockDB();
+      } else {
+        await supabase.from('users').delete().eq('id', id);
+      }
+    };
+
+    function renderReportsTable() {
+      const tbody = document.getElementById('report-table-body');
+      if (dbMock.transactions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada riwayat transaksi</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = dbMock.transactions.slice().reverse().map(t => `
+        <tr>
+          <td class="p-3 font-bold text-slate-800">#${t.id.substr(-8)}</td>
+          <td class="p-3">${new Date(t.date).toLocaleDateString('id-ID')} ${t.time || ''}</td>
+          <td class="p-3">${t.cashier}</td>
+          <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold">${t.paymentMethod}</span></td>
+          <td class="p-3 text-right font-bold text-brand-600">Rp ${(t.total||0).toLocaleString('id-ID')}</td>
+          <td class="p-3 text-center">
+            <button onclick='reprintReceipt(${JSON.stringify(t)})' class="p-1 text-slate-500 hover:bg-slate-100 rounded"><i data-lucide="printer" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.reprintReceipt = function(trx) {
+      printReceipt(trx);
+    };
+
+    window.exportReportToCSV = function() {
+      if (dbMock.transactions.length === 0) {
+        alert('Tidak ada transaksi untuk diexport');
+        return;
+      }
+      let csv = 'ID Transaksi,Tanggal,Waktu,Kasir,Metode Pembayaran,Total\n';
+      dbMock.transactions.forEach(t => {
+        csv += `${t.id},"${new Date(t.date).toLocaleDateString('id-ID')}",${t.time},${t.cashier},${t.paymentMethod},${t.total}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `Laporan_POS_${Date.now()}.csv`);
+      a.click();
+    };
+
+    window.saveSettings = async function() {
+      const header = document.getElementById('settings-receipt-header').value;
+      const footer = document.getElementById('settings-receipt-footer').value;
+
+      dbMock.settings.receiptHeader = header;
+      dbMock.settings.receiptFooter = footer;
+
+      if (IS_PREVIEW) {
+        saveMockDB();
+      } else {
+        await supabase.from('settings').upsert(mapSettingsToDb(dbMock.settings));
+      }
+      alert('Pengaturan Berhasil Disimpan');
+    };
+
+    window.resetToDummyData = function() {
+      if (confirm('Apakah Anda yakin ingin mereset seluruh data kembali ke set awal dummy?')) {
+        dbMock = { ...DUMMY_DATA };
+        saveMockDB();
+        alert('Database telah direset ke data dummy!');
+      }
+    };
+
+    // -----------------------------------------------------------------
+    // 8. AUTHENTICATION & LOGIN LOGIC
+    // -----------------------------------------------------------------
+    window.switchLoginType = function(type) {
+      const kasirForm = document.getElementById('form-login-kasir');
+      const adminForm = document.getElementById('form-login-admin');
+      const tabKasir = document.getElementById('tab-login-kasir');
+      const tabAdmin = document.getElementById('tab-login-admin');
+
+      if (type === 'kasir') {
+        kasirForm.classList.remove('hidden');
+        adminForm.classList.add('hidden');
+        tabKasir.classList.add('bg-white', 'shadow', 'text-brand-600');
+        tabKasir.classList.remove('text-slate-500');
+        tabAdmin.classList.remove('bg-white', 'shadow', 'text-brand-600');
+        tabAdmin.classList.add('text-slate-500');
+      } else {
+        adminForm.classList.remove('hidden');
+        kasirForm.classList.add('hidden');
+        tabAdmin.classList.add('bg-white', 'shadow', 'text-brand-600');
+        tabAdmin.classList.remove('text-slate-500');
+        tabKasir.classList.remove('bg-white', 'shadow', 'text-brand-600');
+        tabKasir.classList.add('text-slate-500');
+      }
+    };
+
+    window.handleKasirLogin = function(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-kasir-username').value.trim();
+      const pin = document.getElementById('login-kasir-pin').value.trim();
+
+      const foundUser = dbMock.users.find(u => u.username === username && u.pin === pin);
+      if (foundUser) {
+        setLoggedInUser({ username: foundUser.username, name: foundUser.name, role: foundUser.role });
+      } else {
+        alert('Username atau PIN Kasir Salah!');
+      }
+    };
+
+    window.handleAdminLogin = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-admin-email').value.trim();
+      const pass = document.getElementById('login-admin-password').value.trim();
+
+      if (IS_PREVIEW) {
+        setLoggedInUser({ username: 'admin', name: 'Admin Master', role: 'Admin' });
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+        if (error) throw error;
+        setLoggedInUser({ username: data.user.email, name: 'Admin Supabase', role: 'Admin' });
+      } catch (err) {
+        alert('Gagal Login Supabase Auth: ' + err.message);
+      }
+    };
+
+    function setLoggedInUser(user) {
+      currentUser = user;
+      document.getElementById('login-overlay').classList.add('hidden');
+      document.getElementById('user-display-name').innerText = user.name;
+      document.getElementById('user-display-role').innerText = user.role;
+      document.getElementById('user-avatar-initial font-bold').innerText = user.name.charAt(0);
+      switchTab('dashboard');
+    }
+
+    window.handleLogout = async function() {
+      currentUser = null;
+      if (!IS_PREVIEW) {
+        await supabase.auth.signOut();
+      }
+      document.getElementById('login-overlay').classList.remove('hidden');
+    };
+
+    // -----------------------------------------------------------------
+    // 9. NAVIGATION & TAB SWITCHING
+    // -----------------------------------------------------------------
+    window.switchTab = function(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-brand-500', 'text-white'));
+      const activeNav = document.getElementById(`nav-${tabName}`);
+      if (activeNav) activeNav.classList.add('bg-brand-500', 'text-white');
+
+      // Update Header Title
+      const titles = {
+        dashboard: 'Dashboard',
+        pos: 'POS Kasir Transaksi',
+        products: 'Manajemen Produk & Menu',
+        outlets: 'Cabang Outlet Toko',
+        employees: 'Data Karyawan',
+        users: 'Manajemen User & Kasir',
+        reports: 'Laporan Penjualan',
+        settings: 'Pengaturan Sistem'
+      };
+      document.getElementById('page-title').innerText = titles[tabName] || 'Dashboard';
+    };
+
+    // -----------------------------------------------------------------
+    // 10. HELPER MODAL & UTILS
+    // -----------------------------------------------------------------
+    function showModal(contentHtml) {
+      const box = document.getElementById('modal-box');
+      box.innerHTML = contentHtml + `
+        <button onclick="closeModal()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold mt-2">Batal / Tutup</button>
+      `;
+      document.getElementById('modal-backdrop').classList.remove('hidden');
+    }
+
+    window.closeModal = function() {
+      document.getElementById('modal-backdrop').classList.add('hidden');
+    };
+
+    window.openMobileMenuModal = function() {
+      showModal(`
+        <h3 class="font-bold text-slate-800 text-base mb-3">Menu Lainnya</h3>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button onclick="closeModal(); switchTab('outlets')" class="p-3 bg-slate-100 rounded-xl font-bold flex items-center gap-2"><i data-lucide="building-2" class="w-4 h-4"></i> Outlet Toko</button>
+          <button onclick="closeModal(); switchTab('employees')" class="p-3 bg-slate-100 rounded-xl font-bold flex items-center gap-2"><i data-lucide="users" class="w-4 h-4"></i> Karyawan</button>
+          <button onclick="closeModal(); switchTab('users')" class="p-3 bg-slate-100 rounded-xl font-bold flex items-center gap-2"><i data-lucide="user-cog" class="w-4 h-4"></i> Manajemen User</button>
+          <button onclick="closeModal(); switchTab('settings')" class="p-3 bg-slate-100 rounded-xl font-bold flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4"></i> Pengaturan</button>
+        </div>
+      `);
+      lucide.createIcons();
+    };
+
+    // Clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clock-time').innerText = now.toLocaleTimeString('id-ID');
+      document.getElementById('clock-date').innerText = now.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }, 1000);
+
+    // -----------------------------------------------------------------
+    // 11. DYNAMIC SERVICE WORKER FOR PWA
+    // -----------------------------------------------------------------
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        self.addEventListener('install', (e) => self.skipWaiting());
+        self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+        self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+    }
+
+    // -----------------------------------------------------------------
+    // 12. INITIALIZATION ON LOAD
+    // -----------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (IS_PREVIEW) {
+        document.getElementById('preview-badge').classList.remove('hidden');
+      }
+
+      await autoSetupDatabase();
+      setupRealtimeListeners();
+
+      // Default Auto Login In Preview Mode for Easy Evaluation
+      setLoggedInUser({ username: 'kasir1', name: 'Ahmad Kasir', role: 'Kasir' });
+
+      // Settings setup
+      document.getElementById('settings-receipt-header').value = dbMock.settings.receiptHeader || '';
+      document.getElementById('settings-receipt-footer').value = dbMock.settings.receiptFooter || '';
+
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
