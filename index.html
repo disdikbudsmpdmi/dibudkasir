@@ -113,22 +113,22 @@
           <span>POS Kasir</span>
         </button>
 
-        <button onclick="switchTab('products')" id="nav-products" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+        <button onclick="switchTab('products')" id="nav-products" class="owner-only-menu nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
           <i data-lucide="package" class="w-5 h-5"></i>
           <span>Produk / Menu</span>
         </button>
 
-        <button onclick="switchTab('outlets')" id="nav-outlets" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+        <button onclick="switchTab('outlets')" id="nav-outlets" class="owner-only-menu nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
           <i data-lucide="building-2" class="w-5 h-5"></i>
           <span>Outlet Toko</span>
         </button>
 
-        <button onclick="switchTab('employees')" id="nav-employees" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+        <button onclick="switchTab('employees')" id="nav-employees" class="owner-only-menu nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
           <i data-lucide="users" class="w-5 h-5"></i>
           <span>Karyawan</span>
         </button>
 
-        <button onclick="switchTab('users')" id="nav-users" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+        <button onclick="switchTab('users')" id="nav-users" class="owner-only-menu nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
           <i data-lucide="user-cog" class="w-5 h-5"></i>
           <span>Manajemen User</span>
         </button>
@@ -138,7 +138,7 @@
           <span>Laporan</span>
         </button>
 
-        <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
+        <button onclick="switchTab('settings')" id="nav-settings" class="owner-only-menu nav-item w-full flex items-center gap-3 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 text-slate-600 hover:bg-slate-100/80">
           <i data-lucide="sliders" class="w-5 h-5"></i>
           <span>Pengaturan</span>
         </button>
@@ -173,7 +173,7 @@
         <i data-lucide="calculator" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-0.5">POS</span>
       </button>
-      <button onclick="switchTab('products')" id="mob-nav-products" class="flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
+      <button onclick="switchTab('products')" id="mob-nav-products" class="owner-only-menu flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
         <i data-lucide="package" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-0.5">Produk</span>
       </button>
@@ -181,7 +181,7 @@
         <i data-lucide="file-text" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-0.5">Laporan</span>
       </button>
-      <button onclick="openMobileMenuModal()" class="flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
+      <button onclick="openMobileMenuModal()" id="mob-nav-more" class="owner-only-menu flex flex-col items-center p-1.5 text-slate-400 hover:text-brand-600">
         <i data-lucide="menu" class="w-5 h-5"></i>
         <span class="text-[10px] font-medium mt-0.5">Lainnya</span>
       </button>
@@ -525,33 +525,65 @@
 
         <!-- 8. PENGATURAN TAB -->
         <section id="tab-settings" class="tab-content hidden space-y-6">
-          <div class="glass-card p-5 rounded-2xl max-w-2xl space-y-4">
-            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-2">Konfigurasi Aplikasi</h3>
-            
-            <div class="space-y-3">
-              <label class="block text-xs font-bold text-slate-600">Status Saklar Deployment (Supabase vs Preview)</label>
-              <div class="p-3 bg-slate-100 rounded-xl text-xs text-slate-600 flex items-center justify-between">
-                <span>Status Mode: <strong id="settings-preview-status" class="text-brand-600">PREVIEW MODE</strong></span>
-                <span class="text-[10px] bg-slate-200 px-2 py-1 rounded">Edit di JS: IS_PREVIEW</span>
+
+          <!-- Profil & Cetakan Toko -->
+          <div class="glass-card p-5 md:p-6 rounded-2xl space-y-5">
+            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-3">Profil & Cetakan Toko</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="space-y-2">
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nama Usaha / Toko</label>
+                <input type="text" id="settings-store-name" placeholder="Nama Toko Anda" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">No. Telepon Toko</label>
+                <input type="text" id="settings-store-phone" placeholder="08xxxxxxxxxx" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Alamat Lengkap Toko</label>
+                <textarea id="settings-store-address" rows="4" placeholder="Jl. Nama Jalan No. Toko" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+              </div>
+
+              <div class="space-y-5">
+                <div class="space-y-2">
+                  <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Catatan Kaki Struk (Receipt Footer)</label>
+                  <input type="text" id="settings-receipt-footer" placeholder="Terima Kasih dan Selamat Menikmati!" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Diskon Semua Produk (%)</label>
+                  <input type="number" min="0" max="100" step="0.1" id="settings-global-discount" placeholder="0" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
               </div>
             </div>
 
-            <div class="space-y-3 border-t pt-3 border-slate-100">
-              <label class="block text-xs font-bold text-slate-600">Format Header Struk Cetak</label>
-              <textarea id="settings-receipt-header" rows="2" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs" placeholder="Pesan ucapan di atas struk..."></textarea>
-            </div>
-
-            <div class="space-y-3">
-              <label class="block text-xs font-bold text-slate-600">Format Footer Struk Cetak</label>
-              <textarea id="settings-receipt-footer" rows="2" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-xs" placeholder="Terima kasih telah berbelanja..."></textarea>
-            </div>
-
-            <div class="pt-3 border-t border-slate-100 flex gap-3">
-              <button onclick="saveSettings()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md">
-                Simpan Pengaturan
+            <div class="pt-2">
+              <button onclick="saveSettings()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2">
+                <i data-lucide="save" class="w-4 h-4"></i> Simpan Pengaturan
               </button>
-              <button onclick="resetToDummyData()" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-bold shadow-md">
-                Reset & Setup Uang/Data Dummy
+            </div>
+          </div>
+
+          <!-- Pemeliharaan & Cadangan Data (Owner Only) -->
+          <div id="settings-backup-section" class="owner-only-menu glass-card p-5 md:p-6 rounded-2xl space-y-4 border border-red-100">
+            <h3 class="font-bold text-red-600 text-lg flex items-center gap-2 border-b border-slate-100 pb-3">
+              <i data-lucide="database" class="w-5 h-5"></i> Pemeliharaan & Cadangan Data (Owner Only)
+            </h3>
+            <p class="text-xs md:text-sm text-slate-500">
+              Gunakan fitur ini untuk mencadangkan seluruh data toko Anda ke file lokal, memulihkan data dari file cadangan, atau mengosongkan database Anda ke kondisi bersih awal.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button onclick="exportDataBackup()" class="flex-1 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-4 h-4"></i> Ekspor Data (Backup)
+              </button>
+              <button onclick="document.getElementById('import-data-file').click()" class="flex-1 px-4 py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2">
+                <i data-lucide="upload" class="w-4 h-4"></i> Impor Data (Restore)
+              </button>
+              <input type="file" id="import-data-file" accept="application/json" class="hidden" onchange="importDataBackup(event)">
+              <button onclick="deleteTransactionHistory()" class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Hapus Riwayat Transaksi
               </button>
             </div>
           </div>
@@ -669,8 +701,8 @@
       paymentMethod: r.payment_method, cashGiven: r.cash_given, change: r.change_amount, cashier: r.cashier
     });
 
-    const mapSettingsToDb = (s) => ({ id: 'config', receipt_header: s.receiptHeader, receipt_footer: s.receiptFooter });
-    const mapSettingsFromDb = (r) => ({ receiptHeader: r.receipt_header, receiptFooter: r.receipt_footer });
+    const mapSettingsToDb = (s) => ({ id: 'config', receipt_header: s.receiptHeader, receipt_footer: s.receiptFooter, global_discount: s.globalDiscount || 0 });
+    const mapSettingsFromDb = (r) => ({ receiptHeader: r.receipt_header, receiptFooter: r.receipt_footer, globalDiscount: r.global_discount || 0 });
 
     const mapEmployeeToDb = (e) => ({ id: e.id, name: e.name, role: e.role, phone: e.phone, status: e.status, outlet_id: e.outletId });
     const mapEmployeeFromDb = (r) => ({ id: r.id, name: r.name, role: r.role, phone: r.phone, status: r.status, outletId: r.outlet_id });
@@ -690,7 +722,7 @@
       users: [],
       employees: [],
       transactions: [],
-      settings: { receiptHeader: 'Selamat Datang di Toko Kami!', receiptFooter: 'Terima Kasih Telah Berbelanja!' }
+      settings: { receiptHeader: 'Selamat Datang di Toko Kami!', receiptFooter: 'Terima Kasih Telah Berbelanja!', globalDiscount: 0 }
     };
 
     // -----------------------------------------------------------------
@@ -718,7 +750,8 @@
       transactions: [],
       settings: {
         receiptHeader: 'POS KASIR MODERN\nSentosa Plaza Lantai 1',
-        receiptFooter: 'Barang yang sudah dibeli tidak dapat ditukar.\nTerima Kasih!'
+        receiptFooter: 'Barang yang sudah dibeli tidak dapat ditukar.\nTerima Kasih!',
+        globalDiscount: 0
       }
     };
 
@@ -829,8 +862,23 @@
       renderUsersTable();
       renderReportsTable();
       updateSidebarOutlet();
+      renderSettingsForm();
       lucide.createIcons();
     };
+
+    function renderSettingsForm() {
+      const outlet = dbMock.outlets[0] || { name: '', address: '', phone: '' };
+      const storeNameEl = document.getElementById('settings-store-name');
+      const storePhoneEl = document.getElementById('settings-store-phone');
+      const storeAddressEl = document.getElementById('settings-store-address');
+      const footerEl = document.getElementById('settings-receipt-footer');
+      const discountEl = document.getElementById('settings-global-discount');
+      if (storeNameEl) storeNameEl.value = outlet.name || '';
+      if (storePhoneEl) storePhoneEl.value = outlet.phone || '';
+      if (storeAddressEl) storeAddressEl.value = outlet.address || '';
+      if (footerEl) footerEl.value = (dbMock.settings && dbMock.settings.receiptFooter) || '';
+      if (discountEl) discountEl.value = (dbMock.settings && dbMock.settings.globalDiscount) || 0;
+    }
 
     function updateSidebarOutlet() {
       const outlet = dbMock.outlets[0] || { name: 'Outlet Toko', address: '-' };
@@ -1517,18 +1565,122 @@
     };
 
     window.saveSettings = async function() {
-      const header = document.getElementById('settings-receipt-header').value;
+      const storeName = document.getElementById('settings-store-name').value.trim();
+      const storePhone = document.getElementById('settings-store-phone').value.trim();
+      const storeAddress = document.getElementById('settings-store-address').value.trim();
       const footer = document.getElementById('settings-receipt-footer').value;
+      const globalDiscount = parseFloat(document.getElementById('settings-global-discount').value) || 0;
 
-      dbMock.settings.receiptHeader = header;
       dbMock.settings.receiptFooter = footer;
+      dbMock.settings.globalDiscount = globalDiscount;
+
+      // Simpan profil toko ke outlet utama (outlet pertama)
+      let outlet = dbMock.outlets[0];
+      if (!outlet) {
+        outlet = { id: 'out-' + Date.now(), name: storeName, address: storeAddress, phone: storePhone };
+        dbMock.outlets.push(outlet);
+      } else {
+        outlet.name = storeName;
+        outlet.address = storeAddress;
+        outlet.phone = storePhone;
+      }
 
       if (IS_PREVIEW) {
         saveMockDB();
       } else {
         await supabase.from('settings').upsert(mapSettingsToDb(dbMock.settings));
+        await supabase.from('outlets').update({ name: outlet.name, address: outlet.address, phone: outlet.phone }).eq('id', outlet.id);
+        renderAllData();
       }
       alert('Pengaturan Berhasil Disimpan');
+    };
+
+    // -----------------------------------------------------------------
+    // BACKUP / RESTORE / MAINTENANCE DATA (OWNER ONLY)
+    // -----------------------------------------------------------------
+    window.exportDataBackup = function() {
+      const backupPayload = {
+        exportedAt: new Date().toISOString(),
+        data: dbMock
+      };
+      const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `Backup_POS_${Date.now()}.json`);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+
+    window.importDataBackup = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const incoming = parsed && parsed.data ? parsed.data : parsed;
+
+          if (!incoming || !incoming.outlets || !incoming.products) {
+            alert('File cadangan tidak valid.');
+            return;
+          }
+
+          if (!confirm('Memulihkan data ini akan menimpa seluruh data toko saat ini. Lanjutkan?')) return;
+
+          dbMock = {
+            outlets: incoming.outlets || [],
+            products: incoming.products || [],
+            users: incoming.users || [],
+            employees: incoming.employees || [],
+            transactions: incoming.transactions || [],
+            settings: incoming.settings || dbMock.settings
+          };
+
+          if (IS_PREVIEW) {
+            saveMockDB();
+          } else {
+            await supabase.from('products').delete().neq('id', '');
+            await supabase.from('outlets').delete().neq('id', '');
+            await supabase.from('employees').delete().neq('id', '');
+            await supabase.from('users').delete().neq('id', '');
+            await supabase.from('transactions').delete().neq('id', '');
+
+            if (dbMock.outlets.length) await supabase.from('outlets').insert(dbMock.outlets);
+            if (dbMock.products.length) await supabase.from('products').insert(dbMock.products.map(mapProductToDb));
+            if (dbMock.employees.length) await supabase.from('employees').insert(dbMock.employees.map(mapEmployeeToDb));
+            if (dbMock.users.length) await supabase.from('users').insert(dbMock.users.map(mapUserToDb));
+            if (dbMock.transactions.length) await supabase.from('transactions').insert(dbMock.transactions.map(mapTrxToDb));
+            await supabase.from('settings').upsert(mapSettingsToDb(dbMock.settings));
+            renderAllData();
+          }
+
+          alert('Data berhasil dipulihkan dari cadangan!');
+        } catch (err) {
+          console.error(err);
+          alert('Gagal membaca file cadangan. Pastikan file JSON valid.');
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    window.deleteTransactionHistory = async function() {
+      if (!confirm('Seluruh riwayat transaksi akan dihapus permanen dan tidak dapat dikembalikan. Yakin ingin melanjutkan?')) return;
+      if (!confirm('Konfirmasi sekali lagi: hapus SEMUA riwayat transaksi sekarang?')) return;
+
+      dbMock.transactions = [];
+
+      if (IS_PREVIEW) {
+        saveMockDB();
+      } else {
+        await supabase.from('transactions').delete().neq('id', '');
+        renderAllData();
+      }
+
+      alert('Riwayat transaksi berhasil dikosongkan.');
     };
 
     window.resetToDummyData = function() {
@@ -1603,7 +1755,24 @@
       document.getElementById('user-display-name').innerText = user.name;
       document.getElementById('user-display-role').innerText = user.role;
       document.getElementById('user-avatar-initial font-bold').innerText = user.name.charAt(0);
+      applyRoleAccess(user.role);
       switchTab('dashboard');
+    }
+
+    // -----------------------------------------------------------------
+    // ROLE-BASED MENU ACCESS
+    // Kasir: Dashboard, POS Kasir, Laporan
+    // Owner / Admin: Full akses semua menu
+    // -----------------------------------------------------------------
+    function isOwnerRole(role) {
+      return role !== 'Kasir';
+    }
+
+    function applyRoleAccess(role) {
+      const isOwner = isOwnerRole(role);
+      document.querySelectorAll('.owner-only-menu').forEach(el => {
+        el.classList.toggle('hidden', !isOwner);
+      });
     }
 
     window.handleLogout = async function() {
@@ -1617,7 +1786,14 @@
     // -----------------------------------------------------------------
     // 9. NAVIGATION & TAB SWITCHING
     // -----------------------------------------------------------------
+    const OWNER_ONLY_TABS = ['products', 'outlets', 'employees', 'users', 'settings'];
+
     window.switchTab = function(tabName) {
+      if (currentUser && !isOwnerRole(currentUser.role) && OWNER_ONLY_TABS.includes(tabName)) {
+        alert('Menu ini khusus untuk akun Owner.');
+        tabName = 'dashboard';
+      }
+
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
@@ -1703,8 +1879,7 @@
       setLoggedInUser({ username: 'kasir1', name: 'Ahmad Kasir', role: 'Kasir' });
 
       // Settings setup
-      document.getElementById('settings-receipt-header').value = dbMock.settings.receiptHeader || '';
-      document.getElementById('settings-receipt-footer').value = dbMock.settings.receiptFooter || '';
+      renderSettingsForm();
 
       lucide.createIcons();
     });
